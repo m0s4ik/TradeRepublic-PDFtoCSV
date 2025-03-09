@@ -348,8 +348,11 @@
                 
                 // Skip header items (find items with field names like "DATUM", "TYP", etc.)
                 const headerItems = validItems.filter(item => 
-                    ["DATA", "TIPO", "DESCRIZIONE", "SALDO",
-                     "DATUM", "TYP", "BESCHREIBUNG", "SALDO"
+                    ["DATA", "TIPO", "DESCRIZIONE", "SALDO", // Italian
+                        "DATUM", "TYP", "BESCHREIBUNG", "SALDO", // German
++                       "DATE", "TYPE", "DESCRIPTION", "BALANCE", // English not tested
++                       "FECHA", "TIPO", "DESCRIPCIÓN", "SALDO", // Spanish not tested
++                       "DATE", "TYPE", "DESCRIPTION", "SOLDE" // French not tested
                     ].includes(item.text));
                 
                 const startIndex = headerItems.length > 0 ? 
@@ -358,7 +361,7 @@
                 logDebug(`Page ${pageNum}: ${headerItems.length} headers found, starting from index ${startIndex}`);
                 
                 // Find all date elements (potential transaction starts)
-                const datePattern = /^(\d{1,2})\s+(Jan|Feb|März|Apr|Mai|Jun|Jul|Aug|Sept|Okt|Nov|Dez|Gen|Feb|Mar|Apr|Mag|Giu|Lug|Ago|Set|Ott|Nov|Dic)/i;
+                const datePattern = /^(\d{1,2})\s+(Jan|Feb|März|Apr|Mai|Jun|Jul|Aug|Sept|Okt|Nov|Dez|Gen|Feb|Mar|Apr|Mag|Giu|Lug|Ago|Set|Ott|Nov|Dic|Jan\.|Feb\.|Mar\.|Apr\.|May|Jun\.|Jul\.|Aug\.|Sep\.|Oct\.|Nov\.|Dec\.|Ene|Feb|Mar|Abr|May|Jun|Jul|Ago|Sep|Oct|Nov|Dic|Janv|Févr|Mars|Avr|Mai|Juin|Juil|Août|Sept|Oct|Nov|Déc)/i;
                 const dateElements = validItems.filter(item => 
                     matchesField(item, 'date') && 
                     datePattern.test(item.text.trim())
