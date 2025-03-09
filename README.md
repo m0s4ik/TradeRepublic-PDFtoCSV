@@ -9,6 +9,10 @@ A tool to convert Trade Republic PDF statements into CSV or Excel format.
 *   100% client-side processing: Your data stays private.
 *   No registration or server-side data processing.
 
+## Demo
+
+Try the online demo: [https://m0s4ik.github.io/TradeRepublic-PDFtoCSV/](https://m0s4ik.github.io/TradeRepublic-PDFtoCSV/)
+
 ## Usage
 
 1.  Open `index.html` in your browser.
