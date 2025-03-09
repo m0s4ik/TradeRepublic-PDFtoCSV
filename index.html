@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Republic Statement Export Tool | PDF to Excel & CSV Converter</title>
+    <meta name="description" content="Free Trade Republic Statement Converter: Easily convert your PDF statements to Excel, CSV, or JSON. 100% private - No server data, no registration required!">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        #transactionContainer {
+            margin-top: 30px;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        .debug-info {
+            font-family: monospace;
+            font-size: 0.8em;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 20px 0;
+        }
+        .button-container button {
+            padding: 8px 12px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background-color: #f2f2f2;
+            border-radius: 4px;
+        }
+        .button-container button:hover {
+            background-color: #e0e0e0;
+        }
+        #status {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+        }
+        /* Style for the SEO content section */
+        .seo-content {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
+        }
+        @media (max-width: 768px) {
+            .button-container {
+                flex-direction: column;
+            }
+            .button-container button {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Trade Republic Statement Exporter</h1>
+    <p>Upload a Trade Republic statement to export the transactions and bookings</p>
+    
+    <input type="file" id="fileInput" accept="application/pdf">
+    <button id="extractBtn" disabled>Extract all Transactions</button>
+    <div id="status">Upload Statement</div>
+    <label><input type="checkbox" id="showDebug"> Show Debug Information</label>
+    
+    <div id="debugInfo" class="debug-info"></div>
+    <div id="transactionContainer"></div>
+    
+    <!-- SEO Content Section - Always visible -->
+    <p>I developed this <strong>free converter for Trade Republic users</strong> because I was frustrated that I could only export my own statements as PDF and not directly as Excel or CSV.</p>
+
+    <h2>The solution for Trade Republic PDF exports</h2>
+    
+    <p>Perhaps you know the problem too: Trade Republic only provides statements as PDFs. For my own financial management and tax returns, however, I needed Excel or CSV files. That's why I built a simple solution that solves exactly this problem.</p>
+    
+    <h3>How the converter works – in three easy steps:</h3>
+    
+    <ol>
+        <li><strong>Upload PDF</strong> – Upload your Trade Republic statement (locally in your browser).</li>
+        <li><strong>Convert</strong> – The tool automatically extracts all relevant transaction data.</li>
+        <li><strong>Download</strong> – Save the results as an Excel or CSV file.</li>
+    </ol>
+    
+    <h3>Where can you find your Trade Republic statement?</h3>
+    
+    <p>If you don't have a PDF file yet, you can easily find it in the Trade Republic app:</p>
+    
+    <ol>
+        <li>Open the Trade Republic app on your smartphone.</li>
+        <li>Tap on your profile.</li>
+        <li>Scroll to "More" and select "Statements".</li>
+        <li>Download your statement.</li>
+    </ol>
+    
+    <h2>Why I developed this Trade Republic converter</h2>
+    
+    <ul>
+        <li><strong>Privacy first:</strong> All data stays on your device and is never sent to servers.</li>
+        <li><strong>No registration required:</strong> I want to keep the tool simple and straightforward.</li>
+        <li><strong>Flexible to use:</strong> Export as Excel, CSV, or JSON possible.</li>
+        <li><strong>Free and transparent:</strong> I don't earn anything from it – the tool is completely free and without advertising.</li>
+        <li><strong>Reliable:</strong> Developed specifically for the PDF statements from Trade Republic.</li>
+    </ul>
+    
+    <h2>Frequently asked questions about Trade Republic Export</h2>
+    
+    <h4>Is it safe to upload my statement?</h4>
+    <p>Yes. Your statement remains 100% local in your browser. No data is transferred to external servers.</p>
+    
+    <h4>Which data is exported?</h4>
+    <p>The tool extracts important transaction information such as date, type of transaction, description, incoming and outgoing amounts, and your account balance.</p>
+    
+    <h4>Why doesn't Trade Republic offer a direct Excel or CSV export?</h4>
+    <p>Trade Republic currently only provides PDFs. My tool closes this gap so that you can still process the data conveniently.</p>
+    
+    <h4>Does the tool work with all Trade Republic PDFs?</h4>
+    <p>The tool is tailored to current Trade Republic statements. If something doesn't work, please feel free to contact me.</p>
+    
+    <h2>Feedback and Support</h2>
+    
+    <p>Based on the original work by 
+        <a href="https://kontoauszug.jonathanpagel.com/" target="_blank" rel="noopener">Jonathan Pagel</a>.</p>
+    
+    
+    <script>
+        // Initialize PDF.js
+        const pdfjsLib = window.pdfjsLib;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const extractBtn = document.getElementById('extractBtn');
+        const status = document.getElementById('status');
+        const transactionContainer = document.getElementById('transactionContainer');
+        const debugInfo = document.getElementById('debugInfo');
+        const showDebugCheckbox = document.getElementById('showDebug');
+
+        // Variables
+        let pdfDoc = null;
+        let textData = {};
+        const scale = 1.0; // PDF scale factor
+        
+        // Debug logging
+        function logDebug(message) {
+            const timestamp = new Date().toISOString().substr(11, 8);
+            const debugMessage = `[${timestamp}] ${message}`;
+            debugInfo.innerHTML += debugMessage + '<br>';
+        }
+        
+        showDebugCheckbox.addEventListener('change', function() {
+            debugInfo.style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Event listeners
+        fileInput.addEventListener('change', loadPDF);
+        extractBtn.addEventListener('click', extractAllPages);
+
+        function loadPDF(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            status.textContent = "Loading PDF...";
+            
+            const fileReader = new FileReader();
+            fileReader.onload = function() {
+                const typedArray = new Uint8Array(this.result);
+                
+                pdfjsLib.getDocument(typedArray).promise.then(function(pdf) {
+                    pdfDoc = pdf;
+                    status.textContent = `PDF successfully loaded. ${pdf.numPages} pages detected.`;
+                    extractBtn.disabled = false;
+                })
+                .catch(error => {
+                    console.error("Error loading PDF:", error);
+                    status.textContent = "Could not load PDF: " + error.message;
+                    alert("Could not load PDF: " + error.message);
+                });
+            };
+            
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        async function extractAllPages() {
+            if (!pdfDoc) {
+                alert("No PDF loaded");
+                return;
+            }
+            
+            // Clear debug info
+            debugInfo.innerHTML = '';
+            
+            const totalPages = pdfDoc.numPages;
+            status.textContent = `Processing all ${totalPages} pages...`;
+            
+            // Reset data
+            textData = {
+                totalPages: totalPages,
+                pages: {}
+            };
+            
+            // Process each page
+            for (let i = 1; i <= totalPages; i++) {
+                status.textContent = `Processing page ${i}/${totalPages}...`;
+                await processPage(i);
+            }
+            
+            status.textContent = `Completed! ${totalPages} pages processed.`;
+            
+            // Extract transactions
+            const transactions = extractTransactions(textData);
+            
+            // Display transactions in HTML table
+            displayTransactions(transactions);
+            
+            // Add download buttons instead of auto-downloading
+            addDownloadButtons(textData, transactions);
+        }
+
+        async function processPage(pageNumber) {
+            return new Promise((resolve, reject) => {
+                pdfDoc.getPage(pageNumber).then(function(page) {
+                    const viewport = page.getViewport({ scale });
+                    
+                    // Get text content
+                    page.getTextContent().then(textContent => {
+                        const pageData = [];
+                        
+                        // Process each text item
+                        textContent.items.forEach((item, index) => {
+                            // Skip empty text items
+                            if (!item.str.trim()) return;
+                            
+                            // Transform from PDF space to scaled viewport space
+                            const tx = pdfjsLib.Util.transform(
+                                viewport.transform,
+                                item.transform
+                            );
+                            
+                            // Calculate font size
+                            const fontSize = Math.sqrt((tx[0] * tx[0]) + (tx[1] * tx[1]));
+                            const height = fontSize;
+                            
+                            // Calculate PDF coordinates (bottom-left origin)
+                            const pdfX = item.transform[4];
+                            const pdfY = item.transform[5];
+                            
+                            // Store element data with all corners
+                            pageData.push({
+                                text: item.str,
+                                elementIndex: index,
+                                pdfCoordinates: {
+                                    topLeft: { x: Math.round(pdfX), y: Math.round(pdfY) },
+                                    topRight: { x: Math.round(pdfX + item.width), y: Math.round(pdfY) },
+                                    bottomLeft: { x: Math.round(pdfX), y: Math.round(pdfY - (height / scale)) },
+                                    bottomRight: { x: Math.round(pdfX + item.width), y: Math.round(pdfY - (height / scale)) }
+                                }
+                            });
+                        });
+                        
+                        // Store in the global data object
+                        textData.pages[pageNumber] = pageData;
+                        resolve();
+                    }).catch(reject);
+                }).catch(reject);
+            });
+        }
+        
+        function extractTransactions(textData) {
+            const transactions = [];
+            
+            // Define coordinate ranges for each field type
+            const ranges = {
+                date: { min: 45, max: 80 },
+                type: { min: 75, max: 100 },
+                description: { min: 105, max: 380 },
+                outgoing: { min: 440, max: 490 },
+                incoming: { min: 390, max: 440 },
+                balance: { min: 500, max: 550 }
+            };
+            
+            // Helper function to check if an item matches a field type by x-coordinate
+            function matchesField(item, field) {
+                const x = item.pdfCoordinates.topLeft.x;
+                return x >= ranges[field].min && x <= ranges[field].max;
+            }
+            
+            // Helper function to get Y coordinate for ordering items vertically
+            function getYCoord(item) {
+                return item.pdfCoordinates.topLeft.y;
+            }
+            
+            // Helper function to filter out footer items
+            function isValidTransactionItem(item) {
+                // Filter out items in the footer area (below y=60)
+                return getYCoord(item) >= 60;
+            }
+            
+            // Log function for debugging date elements
+            function logDateElement(page, text, y) {
+                logDebug(`Date element found on page ${page}: "${text}" at y=${y}`);
+            }
+            
+            // Process all text items on each page
+            Object.keys(textData.pages).forEach(pageNum => {
+                const items = textData.pages[pageNum];
+                
+                // Filter out footer items first
+                const validItems = items.filter(isValidTransactionItem);
+                
+                
+                // Skip header items (find items with field names like "DATUM", "TYP", etc.)
+                const headerItems = validItems.filter(item => 
+                    ["DATA", "TIPO", "DESCRIZIONE", "SALDO",
+                     "DATUM", "TYP", "BESCHREIBUNG", "SALDO"
+                    ].includes(item.text));
+                
+                const startIndex = headerItems.length > 0 ? 
+                    Math.max(...headerItems.map(item => item.elementIndex)) + 1 : 0;
+                
+                logDebug(`Page ${pageNum}: ${headerItems.length} headers found, starting from index ${startIndex}`);
+                
+                // Find all date elements (potential transaction starts)
+                const datePattern = /^(\d{1,2})\s+(Jan|Feb|März|Apr|Mai|Jun|Jul|Aug|Sept|Okt|Nov|Dez|Gen|Feb|Mar|Apr|Mag|Giu|Lug|Ago|Set|Ott|Nov|Dic)/i;
+                const dateElements = validItems.filter(item => 
+                    matchesField(item, 'date') && 
+                    datePattern.test(item.text.trim())
+                );
+                
+                // Debug log all found date elements
+                dateElements.forEach(item => {
+                    logDateElement(pageNum, item.text, getYCoord(item));
+                });
+                
+                logDebug(`Page ${pageNum}: ${dateElements.length} date elements found (potential transactions)`);
+                
+                // Process each date element (potential transaction)
+                for (let i = 0; i < dateElements.length; i++) {
+                    const dateItem = dateElements[i];
+                    const nextDateItem = dateElements[i + 1];
+                    
+                    // Find the Y range for this transaction
+                    const currentY = getYCoord(dateItem);
+                    const nextY = nextDateItem ? getYCoord(nextDateItem) : 0;
+                    
+                    // Get the year part (should be directly below the date)
+                    const yearItem = validItems.find(item => 
+                        matchesField(item, 'date') && 
+                        /^20\d{2}$/.test(item.text) && 
+                        Math.abs(getYCoord(item) - currentY) < 15 &&
+                        getYCoord(item) < currentY
+                    );
+                    
+                    // Skip if we can't find a year for this date
+                    if (!yearItem) {
+                        logDebug(`Skipping transaction with date "${dateItem.text}" - no year found`);
+                        continue;
+                    }
+                    
+                    // Get transaction type
+                    const typeItems = validItems.filter(item => 
+                        matchesField(item, 'type') && 
+                        getYCoord(item) <= currentY + 5 &&
+                        getYCoord(item) >= currentY - 5 && 
+                        (nextY === 0 || getYCoord(item) > nextY)
+                    );
+                    
+                    typeItems.sort((a, b) => Math.abs(getYCoord(a) - currentY) - Math.abs(getYCoord(b) - currentY));
+                    const typeItem = typeItems[0]; 
+                    
+                    // Get description items
+                    const descItems = validItems.filter(item => 
+                        matchesField(item, 'description') && 
+                        getYCoord(item) <= currentY + 5 &&
+                        (nextY === 0 || getYCoord(item) > nextY)
+                    );
+                    
+                    descItems.sort((a, b) => getYCoord(b) - getYCoord(a));
+                    
+                    // Get incoming amount if present
+                    const incomingItems = validItems.filter(item => 
+                        matchesField(item, 'incoming') && 
+                        getYCoord(item) <= currentY + 5 &&
+                        getYCoord(item) >= currentY - 5 &&
+                        (nextY === 0 || getYCoord(item) > nextY)
+                    );
+                    
+                    incomingItems.sort((a, b) => Math.abs(getYCoord(a) - currentY) - Math.abs(getYCoord(b) - currentY));
+                    const incomingItem = incomingItems[0];
+                    
+                    // Get outgoing amount if present
+                    const outgoingItems = validItems.filter(item => 
+                        matchesField(item, 'outgoing') && 
+                        getYCoord(item) <= currentY + 5 &&
+                        getYCoord(item) >= currentY - 5 &&
+                        (nextY === 0 || getYCoord(item) > nextY)
+                    );
+                    
+                    outgoingItems.sort((a, b) => Math.abs(getYCoord(a) - currentY) - Math.abs(getYCoord(b) - currentY));
+                    const outgoingItem = outgoingItems[0];
+                    
+                    // Get balance
+                    const balanceItems = validItems.filter(item => 
+                        matchesField(item, 'balance') && 
+                        getYCoord(item) <= currentY + 5 &&
+                        getYCoord(item) >= currentY - 5 &&
+                        (nextY === 0 || getYCoord(item) > nextY)
+                    );
+                    
+                    balanceItems.sort((a, b) => Math.abs(getYCoord(a) - currentY) - Math.abs(getYCoord(b) - currentY));
+                    const balanceItem = balanceItems[0];
+                    
+                    // Build the transaction object if we have the minimum required info
+                    if (dateItem && yearItem) {
+                        const transaction = {
+                            date: `${dateItem.text} ${yearItem.text}`,
+                            type: typeItem ? typeItem.text : '(unknown)',
+                            description: descItems.map(item => item.text).join(' '),
+                            incoming: incomingItem ? incomingItem.text : '',
+                            outgoing: outgoingItem ? outgoingItem.text : '',
+                            balance: balanceItem ? balanceItem.text : '',
+                            page: parseInt(pageNum),
+                            y: currentY
+                        };
+                        
+                        logDebug(`Transaction found: ${JSON.stringify(transaction)}`);
+                        transactions.push(transaction);
+                    }
+                }
+            });
+            
+            // Sort transactions by date
+            transactions.sort((a, b) => {
+                // Extract day, month, year from date strings like "01 Jan. 2025"
+                const aMatch = a.date.match(/(\d+)\s+(\w+)\.\s+(\d{4})/);
+                const bMatch = b.date.match(/(\d+)\s+(\w+)\.\s+(\d{4})/);
+                
+                if (!aMatch || !bMatch) return 0;
+                
+                const months = {
+                    'Jan': 0, 'Feb': 1, 'März': 2, 'Apr': 3, 'Mai': 4, 'Jun': 5,
+                    'Jul': 6, 'Aug': 7, 'Sept': 8, 'Okt': 9, 'Nov': 10, 'Dez': 11
+                };
+                
+                const aYear = parseInt(aMatch[3]);
+                const bYear = parseInt(bMatch[3]);
+                if (aYear !== bYear) return aYear - bYear;
+                
+                const aMonth = months[aMatch[2]];
+                const bMonth = months[bMatch[2]];
+                if (aMonth !== bMonth) return aMonth - bMonth;
+                
+                const aDay = parseInt(aMatch[1]);
+                const bDay = parseInt(bMatch[1]);
+                return aDay - bDay;
+            });
+            
+            return transactions;
+        }
+        
+        function displayTransactions(transactions) {
+            // Create the table structure
+            let html = `
+    <h2>Extracted Transactions (${transactions.length})</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Incoming</th>
+                <th>Outgoing</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            `;
+            
+            // Add each transaction as a row
+            transactions.forEach(transaction => {
+                html += `
+                    <tr>
+                        <td>${transaction.date}</td>
+                        <td>${transaction.type}</td>
+                        <td>${transaction.description}</td>
+                        <td>${transaction.incoming}</td>
+                        <td>${transaction.outgoing}</td>
+                        <td>${transaction.balance}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            // Insert the table into the container
+            transactionContainer.innerHTML = html;
+        }
+
+        function downloadJSON(data, filename) {
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename + '.json';
+            document.body.appendChild(a);
+            a.click();
+            
+            // Cleanup
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+        
+        function addDownloadButtons(textData, transactions) {
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-container';
+            
+            // Format transactions for export by removing page and y fields
+            // and converting money strings to proper number formats
+            const exportTransactions = transactions.map(transaction => {
+                // Create a new object without page and y coordinates
+                const { page, y, ...exportTransaction } = transaction;
+                
+                // Process money values for better export compatibility
+                if (exportTransaction.incoming) {
+                    exportTransaction.incoming = cleanMoneyValue(exportTransaction.incoming);
+                }
+                if (exportTransaction.outgoing) {
+                    exportTransaction.outgoing = cleanMoneyValue(exportTransaction.outgoing);
+                }
+                if (exportTransaction.balance) {
+                    exportTransaction.balance = cleanMoneyValue(exportTransaction.balance);
+                }
+                
+                return exportTransaction;
+            });
+            
+            const excelBtn = document.createElement('button');
+            excelBtn.textContent = 'Download Transactions (Excel)';
+            excelBtn.onclick = () => downloadExcel(exportTransactions, "trade-republic-transactions");
+
+            const csvBtn = document.createElement('button');
+            csvBtn.textContent = 'Download Transactions (CSV)';
+            csvBtn.onclick = () => downloadCSV(exportTransactions, "trade-republic-transactions");
+
+            const jsonBtn = document.createElement('button');
+            jsonBtn.textContent = 'Download Transactions (JSON)';
+            jsonBtn.onclick = () => downloadJSON(exportTransactions, "trade-republic-transactions");
+
+            const rawDataBtn = document.createElement('button');
+            rawDataBtn.textContent = 'Download Raw Data Coordinates (For Debugging Only)';
+            rawDataBtn.onclick = () => downloadJSON(textData, "trade-republic-rawdata");
+            
+            // Add buttons in the requested order with Rohdaten at the end
+            buttonContainer.appendChild(excelBtn);
+            buttonContainer.appendChild(csvBtn);
+            buttonContainer.appendChild(jsonBtn);
+            buttonContainer.appendChild(rawDataBtn);
+            
+            transactionContainer.insertBefore(buttonContainer, transactionContainer.firstChild);
+            
+            // Load required libraries if not already loaded
+            loadLibraries();
+        }
+
+        // Helper function to clean money values
+        function cleanMoneyValue(moneyStr) {
+            // Remove currency symbol and convert to a decimal number
+            return moneyStr.replace(/[^0-9,.]/g, '')
+                          .replace(/\./g, '')  // Remove thousands separators
+                          .replace(',', '.');  // Convert decimal comma to decimal point
+        }
+
+        function loadLibraries() {
+            // Check if SheetJS is already loaded
+            if (typeof XLSX === 'undefined') {
+                const xlsxScript = document.createElement('script');
+                xlsxScript.src = 'https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js';
+                document.head.appendChild(xlsxScript);
+            }
+        }
+
+        function downloadExcel(data, filename) {
+            // Ensure library is loaded
+            if (typeof XLSX === 'undefined') {
+                const waitForXLSX = setInterval(() => {
+                    if (typeof XLSX !== 'undefined') {
+                        clearInterval(waitForXLSX);
+                        createAndDownloadExcel(data, filename);
+                    }
+                }, 100);
+                
+                // Add timeout in case library fails to load
+                setTimeout(() => {
+                    clearInterval(waitForXLSX);
+                    alert('Excel library could not be loaded. Please try again or use the CSV option.');
+                }, 5000);
+            } else {
+                createAndDownloadExcel(data, filename);
+            }
+        }
+
+        function createAndDownloadExcel(data, filename) {
+            try {
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                
+                // Convert data to properly formatted Excel data
+                const formattedData = data.map(item => {
+                    const newItem = {...item};
+                    
+                    // Format date as real Excel date
+                    if (newItem.date) {
+                        // Parse the date string like "01 Jan. 2023"
+                        const dateMatch = newItem.date.match(/(\d+)\s+(\w+)\.\s+(\d{4})/);
+                        if (dateMatch) {
+                            const day = parseInt(dateMatch[1]);
+                            const monthStr = dateMatch[2];
+                            const year = parseInt(dateMatch[3]);
+                            
+                            // Map month names to month numbers (0-based)
+                            const months = {
+                                'Jan': 0, 'Feb': 1, 'März': 2, 'Apr': 3, 'Mai': 4, 'Jun': 5,
+                                'Jul': 6, 'Aug': 7, 'Sept': 8, 'Okt': 9, 'Nov': 10, 'Dez': 11
+                            };
+                            
+                            const month = months[monthStr];
+                            if (month !== undefined) {
+                                // Create a JavaScript Date object
+                                const dateObj = new Date(year, month, day);
+                                // Convert to Excel date format with proper formatting
+                                newItem.date = { 
+                                    v: dateObj, 
+                                    t: 'd', 
+                                    z: 'dd.mm.yyyy' // European date format
+                                };
+                            }
+                        }
+                    }
+                    
+                    // Format as currency for Excel
+                    if (newItem.incoming && newItem.incoming !== '') {
+                        const value = parseFloat(newItem.incoming);
+                        if (!isNaN(value)) {
+                            newItem.incoming = { v: value, t: 'n', z: '#,##0.00 €' };
+                        }
+                    }
+                    
+                    if (newItem.outgoing && newItem.outgoing !== '') {
+                        const value = parseFloat(newItem.outgoing);
+                        if (!isNaN(value)) {
+                            newItem.outgoing = { v: value, t: 'n', z: '#,##0.00 €' };
+                        }
+                    }
+                    
+                    if (newItem.balance && newItem.balance !== '') {
+                        const value = parseFloat(newItem.balance);
+                        if (!isNaN(value)) {
+                            newItem.balance = { v: value, t: 'n', z: '#,##0.00 €' };
+                        }
+                    }
+                    
+                    return newItem;
+                });
+                
+                // Create worksheet with formatted data
+                const ws = XLSX.utils.json_to_sheet(formattedData);
+                
+                // Add worksheet to workbook
+                XLSX.utils.book_append_sheet(wb, ws, "Transactions");
+                
+                // Generate Excel file and trigger download
+                XLSX.writeFile(wb, filename + '.xlsx');
+            } catch (error) {
+                console.error("Error creating Excel file:", error);
+                alert("Could not create Excel file: " + error.message);
+            }
+        }
+        
+        function downloadCSV(data, filename) {
+            try {
+                // Create CSV header row based on first object's keys
+                if (!data || data.length === 0) {
+                    alert('No data to export to CSV');
+                    return;
+                }
+                
+                const headers = Object.keys(data[0]);
+                let csvContent = headers.join(';') + '\n';
+                
+                // Add data rows
+                data.forEach(item => {
+                    const values = headers.map(header => {
+                        // Get the value
+                        const value = item[header] || '';
+                        
+                        // For money values, ensure they're properly formatted as numbers
+                        if (['incoming', 'outgoing', 'balance'].includes(header) && value !== '') {
+                            // Use the numerical value directly
+                            return value;
+                        }
+                        
+                        // Ensure values with commas are quoted
+                        return value.toString().includes(',') ? `"${value}"` : value;
+                    });
+                    csvContent += values.join(',') + '\n';
+                });
+                
+                // Create blob and trigger download
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename + '.csv';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            } catch (error) {
+                console.error("Error creating CSV file:", error);
+                alert("Could not create CSV file: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
