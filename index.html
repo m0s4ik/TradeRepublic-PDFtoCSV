@@ -746,7 +746,7 @@
                         // Ensure values with commas are quoted
                         return value.toString().includes(',') ? `"${value}"` : value;
                     });
-                    csvContent += values.join(',') + '\n';
+                    csvContent += values.join(';') + '\n';
                 });
                 
                 // Create blob and trigger download
